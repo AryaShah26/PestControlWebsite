@@ -1,39 +1,33 @@
-name: Deploy Website to GitHub Pages
+name: Static Website Deployment
 
-# Trigger the workflow on push or pull request to the main branch
+# Trigger the workflow on push to the main branch
 on:
   push:
     branches:
-      - main
+      - main  # Change this if your default branch is different
 
-  pull_request:
-    branches:
-      - main
-
-# Define the jobs to be run
+# Define the job that runs the deployment
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
       # Step 1: Check out the repository code
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js (even though it's a static site, it's needed for npm-related actions)
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
+      # Step 2: Set up GitHub Pages
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v3
 
-      # Step 3: Install GitHub Pages dependency to push the site
-      - name: Install GitHub Pages
-        run: npm install -g gh-pages
-
-      # Step 4: Deploy the site to GitHub Pages
-      - name: Deploy to GitHub Pages
+      # Step 3: Install dependencies (if necessary, for example, if you have build steps)
+      - name: Install dependencies
         run: |
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          gh-pages -d .  # Deploy the current directory
+          npm install
 
+      # Step 4: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./  # The directory to publish, here it is the root of your repository
